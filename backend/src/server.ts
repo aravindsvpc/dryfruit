@@ -29,7 +29,7 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 app.use(cors({
-  origin: 'http://localhost:5173' // or your frontend URL
+  origin: ['http://localhost:5173','https://srisakhambari.onrender.com/']// or your frontend URL
 }));
 // Example usage
 if (require.main === module) {
