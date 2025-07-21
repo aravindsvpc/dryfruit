@@ -8,6 +8,11 @@ import { Product } from './models/Product';
 dotenv.config();
 const app = express();
 
+app.use(cors({
+  origin: ['http://localhost:5173','https://srisakhambari.onrender.com/'],// or your frontend URL
+  credentials: true,
+}));
+app.use(express.json());
 
 const MONGO_URI = process.env.MONGO_URI || '';
 
@@ -28,10 +33,7 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-app.use(cors({
-  origin: ['http://localhost:5173','https://srisakhambari.onrender.com/'],// or your frontend URL
-  credentials: true,
-}));
+
 // Example usage
 if (require.main === module) {
   connectDB();
@@ -80,6 +82,5 @@ if (require.main === module) {
   });
 
 }
-app.use(express.json());
 // app.use('/api', contactRouter);
 
