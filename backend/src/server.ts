@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 import { Product } from './models/Product';
-import contactRouter from './routes/contact';
+
 
 dotenv.config();
 const app = express();
