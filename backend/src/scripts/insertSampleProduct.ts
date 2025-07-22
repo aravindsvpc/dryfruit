@@ -2,24 +2,34 @@ import { Product } from '../models/Product';
 import { connectDB } from '../db2';
 
 const sampleProduct = {
-  id: 'sample-id3',
-  name: 'Sample Product3',
-  category: 'sample-category3',
-  basePrice: 100,
-  image: 'https://images.pexels.com/photos/1295572/pexels-photo-1295572.jpeg?auto=compress&cs=tinysrgb&w=500&h=500&fit=crop',
-  rating: 4.5,
-  description: 'This is a sample product3.',
-  varieties: [
-    {
-      id: 'variety-3',
-      name: 'Sample Variety3',
-      type: 'weight',
-      price: 30,
-      description: 'Sample3 variety description.',
-      image: 'https://images.pexels.com/photos/1295572/pexels-photo-1295572.jpeg?auto=compress&cs=tinysrgb&w=500&h=500&fit=crop',
-      inStock: true,
-      stockQuantity: 10
-    }
+    id: 'kismis',
+    name: 'Kismis (Raisins)',
+    basePrice:100,
+    rating:4.7,
+    category: 'raisins',
+    image: 'https://5.imimg.com/data5/SELLER/Default/2021/11/SA/KH/IG/26477838/indian-natural-green-kismis-raisins-1000x1000.jpg',
+    description: 'Premium quality raisins available in multiple varieties',
+    varieties: [
+      {
+        id: 'kismis-golden',
+        name: 'Golden Kismis',
+        type: 'weight',
+        price: 100,
+        description: 'Sweet and chewy golden raisins, perfect for snacking and cooking',
+        image: 'https://5.imimg.com/data5/SELLER/Default/2021/11/SA/KH/IG/26477838/indian-natural-green-kismis-raisins-1000x1000.jpg',
+        inStock: true,
+        stockQuantity: 50
+      },
+      {
+        id: 'kismis-black',
+        name: 'Black Kismis',
+        type: 'weight',
+        price: 120,
+        description: 'Rich and flavorful black raisins with natural sweetness',
+        image: 'https://mcprod.hyperone.com.eg/media/catalog/product/cache/1ca275941aea0ae98b372dcb44b7c67a/2/3/2394510000000.jpeg',
+        inStock: true,
+        stockQuantity: 45
+      },
   ]
 };
 
