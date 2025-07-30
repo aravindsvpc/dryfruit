@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, User, Search, Menu, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import logo from './logo.png';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -34,8 +35,8 @@ const Header: React.FC = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-amber-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-xl">SS</span>
+            <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-white shadow">
+              <img src={logo} alt="Logo" className="w-full h-full object-cover" />
             </div>
             <span className="text-2xl font-bold text-amber-800">Sri Sakhambari Enterprises</span>
           </Link>

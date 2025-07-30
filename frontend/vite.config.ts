@@ -12,4 +12,9 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  build: {
+    outDir: 'dist', // Ensure build output is in dist
+    sourcemap: false,
+  },
+  base: './', // Use relative base path for static hosting
 });
