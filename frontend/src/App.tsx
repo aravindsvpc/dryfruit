@@ -30,7 +30,7 @@ function App() {
   // Check backend health every 5 seconds until it's up
   useEffect(() => {
     const interval = setInterval(() => {
-      fetch('http://localhost:5000/api/health') // replace with your actual backend health check URL
+      fetch(`${API_BASE_URL}/api/health`) // replace with your actual backend health check URL
         .then((res) => {
           if (res.ok) {
             setIsBackendUp(true);
