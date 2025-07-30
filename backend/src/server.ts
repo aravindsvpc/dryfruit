@@ -9,7 +9,7 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-  origin: ['http://localhost:5173','https://srisakhambari.onrender.com'],// or your frontend URL
+  origin: ['http://localhost:5173','https://srisakhambari.onrender.com','https://srisakhambari-frontend.onrender.com'],// or your frontend URL
   credentials: true,
 }));
 app.use(express.json());
