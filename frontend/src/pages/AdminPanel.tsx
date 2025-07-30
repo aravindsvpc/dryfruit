@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Edit2, Trash2, Eye, Package, Users, ShoppingBag, TrendingUp } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { getFlatProductList, ProductVariety } from '../data/products';
 
 const AdminPanel: React.FC = () => {
   const { user } = useAuth();
@@ -14,15 +15,31 @@ const AdminPanel: React.FC = () => {
     totalCustomers: 567,
     totalRevenue: 45678.90
   };
+    const [allProducts, setAllProducts] = React.useState<(ProductVariety & { inStock: boolean; categoryName: string; productName: string; productId: string; })[]>([]);
+    React.useEffect(() => {
+      getFlatProductList().then((products) => {
+        // Ensure productId is present (fallback to id if needed)
+        setAllProducts(
+          products.map((product: any) => ({
+            ...product,
+            productId: product.productId ?? product.id ?? '',
+            inStock: product.inStock ?? 0, // fallback to 0 if undefined
+          }))
+        );
+      });
+    }, []);
+    // const featuredProducts = allProducts.slice(0, 4);
 
-  const products = [
-    { id: 1, name: 'Premium Almonds', price: 24.99, stock: 150, category: 'Almonds', status: 'Active' },
-    { id: 2, name: 'Roasted Cashews', price: 32.99, stock: 89, category: 'Cashews', status: 'Active' },
-    { id: 3, name: 'Fresh Walnuts', price: 28.99, stock: 45, category: 'Walnuts', status: 'Low Stock' },
-    { id: 4, name: 'Golden Raisins', price: 18.99, stock: 200, category: 'Raisins', status: 'Active' }
-  ];
-
-  const orders = [
+  const products = allProducts.map(product => ({
+    id: product.productId,
+    name: product.productName,
+    price: product.price,
+    inStock: product.inStock ?? 0, // fallback to 0 if undefined
+    category: product.categoryName,
+    status: 'Active' // or set logic for status if needed
+  }));
+  
+    const orders = [
     { id: 1001, customer: 'John Doe', total: 67.98, items: 3, status: 'Shipped', date: '2024-01-15' },
     { id: 1002, customer: 'Jane Smith', total: 45.50, items: 2, status: 'Processing', date: '2024-01-14' },
     { id: 1003, customer: 'Mike Johnson', total: 89.99, items: 4, status: 'Delivered', date: '2024-01-13' },
@@ -208,7 +225,7 @@ const AdminPanel: React.FC = () => {
                           ₹{product.price}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {product.stock}
+                          {typeof product.inStock === 'number' ? product.inStock : 0}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {product.category}

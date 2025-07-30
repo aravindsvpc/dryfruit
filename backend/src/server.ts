@@ -43,6 +43,9 @@ if (require.main === module) {
     const products = await Product.find();
     return res.json(products);
   });
+  app.get('/api/health', async (req, res) => {
+    return res.json({ status: 'ok' });
+  });
 
   app.get('/api/products/:id', async (req, res) => {
     try {
