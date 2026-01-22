@@ -1,47 +1,32 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-export interface IProductVariety extends Document {
-  id: string;
-  name: string;
-  type: string;
-  price: number;
-  description: string;
-  image: string;
-  inStock: boolean;
-  stockQuantity: number;
-}
-
-const ProductVarietySchema: Schema = new Schema({
-  id: { type: String, required: true },
-  name: { type: String, required: true },
-  type: { type: String, required: true },
-  price: { type: Number, required: true },
-  description: { type: String, required: true },
-  image: { type: String, required: true },
-  inStock: { type: Boolean, required: true },
-  stockQuantity: { type: Number, required: true }
-});
-
+// Local type for variety subdocuments (not exported as a separate mongoose model)
+// Product schema (product-only; no separate varieties)
 export interface IProduct extends Document {
   id: string;
   name: string;
   category: string;
-  basePrice: number;
-  image: string;
-  rating: number;
+  price?: number;
+  mrp?: number;
+  type?: string; // e.g. 'weight' | 'unit' | 'pack'
+  images: string[];
+  // rating removed
   description: string;
-  varieties: IProductVariety[];
+  inStock?: boolean;
+  stockQuantity?: number;
 }
 
 const ProductSchema: Schema = new Schema({
   id: { type: String, required: true },
   name: { type: String, required: true },
   category: { type: String, required: true },
-  basePrice: { type: Number, required: true },
-  image: { type: String, required: true },
-  rating: { type: Number, required: true },
+  price: { type: Number },
+  mrp: { type: Number },
+  type: { type: String },
+  images: { type: [String], required: true },
   description: { type: String, required: true },
-  varieties: { type: [ProductVarietySchema], required: true }
+  inStock: { type: Boolean, default: true },
+  stockQuantity: { type: Number, default: 0 }
 });
 
 export const Product = mongoose.model<IProduct>('Product', ProductSchema);

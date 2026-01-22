@@ -1,26 +1,56 @@
-export interface ProductVariety {
-  id: string;
-  name: string;
-  price: number;
-  description: string;
-  type: string;
-  image: string;
-  inStock: boolean;
-  stockQuantity: number;
-}
-
 export interface Product {
   id: string;
   name: string;
   category: string;
-  basePrice: number;
-  image: string;
-  rating: number;
+  price?: number;
+  mrp?: number;
+  type?: string;
+  images: string[];
   description: string;
-  varieties: ProductVariety[];
+  inStock?: boolean;
+  stockQuantity?: number;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ;
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').trim();
+
+// Cache configuration
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+}
+
+const cache: { [key: string]: CacheEntry<any> } = {};
+
+// Cache helper functions
+const isCacheValid = (timestamp: number): boolean => {
+  return Date.now() - timestamp < CACHE_DURATION;
+};
+
+const getCachedData = <T>(key: string): T | null => {
+  const entry = cache[key];
+  if (entry && isCacheValid(entry.timestamp)) {
+    return entry.data;
+  }
+  delete cache[key]; // Remove expired cache
+  return null;
+};
+
+const setCacheData = <T>(key: string, data: T): void => {
+  cache[key] = {
+    data,
+    timestamp: Date.now()
+  };
+};
+
+const clearCache = (key?: string): void => {
+  if (key) {
+    delete cache[key];
+  } else {
+    Object.keys(cache).forEach(k => delete cache[k]);
+  }
+};
 
 // export const products: Product[] = [
 //   {
@@ -70,8 +100,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ;
 //       },
 //       {
 //         id: 'kismis-munakka',
-//         name: 'Munakka',
-//         price: 320,
+      // image: 'https://images.pexels.com/photos/1295572/pexels-photo-1295572.jpeg?auto=compress&cs=tinysrgb&w=500&h=500&fit=crop',
 //         description: 'Large, juicy munakka raisins with seeds, excellent for health',
 //         image: 'https://images.pexels.com/photos/1295572/pexels-photo-1295572.jpeg?auto=compress&cs=tinysrgb&w=500&h=500&fit=crop',
 //         inStock: true,
@@ -108,8 +137,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ;
 //       },
 //       {
 //         id: 'kaju-roasted',
-//         name: 'Roasted Kaju',
-//         price: 900,
+      // image: 'https://images.pexels.com/photos/1295572/pexels-photo-1295572.jpeg?auto=compress&cs=tinysrgb&w=500&h=500&fit=crop',
 //         description: 'Perfectly roasted cashews with light salt, ready to eat',
 //         image: 'https://images.pexels.com/photos/1295572/pexels-photo-1295572.jpeg?auto=compress&cs=tinysrgb&w=500&h=500&fit=crop',
 //         inStock: true,
@@ -146,8 +174,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ;
 //       },
 //       {
 //         id: 'badam-gurbandi',
-//         name: 'Gurbandi Badam',
-//         price: 900,
+      // image: 'https://images.pexels.com/photos/1295572/pexels-photo-1295572.jpeg?auto=compress&cs=tinysrgb&w=500&h=500&fit=crop',    description: 'Fresh walnuts packed with omega-3 fatty acids',
 //         description: 'Small but nutrient-rich Gurbandi almonds from Afghanistan',
 //         image: 'https://images.pexels.com/photos/1295572/pexels-photo-1295572.jpeg?auto=compress&cs=tinysrgb&w=500&h=500&fit=crop',
 //         inStock: true,
@@ -174,8 +201,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ;
 //       },
 //       {
 //         id: 'akhrot-chilean',
-//         name: 'Chilean Akhrot',
-//         price: 800,
+      // image: 'https://images.pexels.com/photos/1295572/pexels-photo-1295572.jpeg?auto=compress&cs=tinysrgb&w=500&h=500&fit=crop',
 //         description: 'High-quality Chilean walnuts, light colored and crispy',
 //         image: 'https://images.pexels.com/photos/1295572/pexels-photo-1295572.jpeg?auto=compress&cs=tinysrgb&w=500&h=500&fit=crop',
 //         inStock: true,
@@ -203,8 +229,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ;
 //       },
 //       {
 //         id: 'pista-california',
-//         name: 'California Pista',
-//         price: 1200,
+      // image: 'https://images.pexels.com/photos/1295572/pexels-photo-1295572.jpeg?auto=compress&cs=tinysrgb&w=500&h=500&fit=crop',
 //         description: 'Large California pistachios, roasted and lightly salted',
 //         image: 'https://images.pexels.com/photos/1295572/pexels-photo-1295572.jpeg?auto=compress&cs=tinysrgb&w=500&h=500&fit=crop',
 //         inStock: true,
@@ -253,22 +278,52 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ;
 // ];
 
 export async function fetchProducts(): Promise<Product[]> {
-  const response = await fetch(`${API_BASE_URL}/api/products`);
-  console.log(response);
+  const cacheKey = 'products_all';
+  
+  // Check cache first
+  const cachedData = getCachedData<Product[]>(cacheKey);
+  if (cachedData) {
+    return cachedData;
+  }
 
+  const response = await fetch(`${API_BASE_URL}/api/products`);
   if (!response.ok) {
     throw new Error('Failed to fetch products');
   }
-  return await response.json();
+  
+  const data = await response.json();
+  setCacheData(cacheKey, data);
+  return data;
 }
 
 export const getAllProducts = (): Promise<Product[]> => {
   return fetchProducts();
 };
+export const createProduct = async (product: Partial<Product>): Promise<Product> => {
+  const res = await fetch(`${API_BASE_URL}/api/products`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(product),
+  });
+  if (!res.ok) throw new Error('Failed to create product');
+  clearCache('products_all'); // Clear cache when product is created
+  return res.json();
+};
 
-export const getProductById = async (id: string): Promise<Product | undefined> => {
-  const products = await fetchProducts();
-  return products.find(p => p.id === id);
+export const updateProduct = async (id: string, updates: Partial<Product>): Promise<Product> => {
+  const res = await fetch(`${API_BASE_URL}/api/products/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updates),
+  });
+  if (!res.ok) throw new Error('Failed to update product');
+  return res.json();
+};
+
+export const deleteProduct = async (id: string): Promise<void> => {
+  const res = await fetch(`${API_BASE_URL}/api/products/${id}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error('Failed to delete product');
+  clearCache('products_all'); // Clear cache when product is deleted
 };
 
 export const getProductsByCategory = async (category: string): Promise<Product[]> => {
@@ -276,25 +331,128 @@ export const getProductsByCategory = async (category: string): Promise<Product[]
   return products.filter(p => p.category === category);
 };
 
-export const getVarietyById = async (productId: string, varietyId: string): Promise<ProductVariety | undefined> => {
-  const product = await getProductById(productId);
-  return product?.varieties.find(v => v.id === varietyId);
+// Flatten products into a shape compatible with the UI components that previously
+// consumed varieties. Each product becomes a single "flat" item.
+export type FlatProduct = Product & { categoryName: string; productName: string; productId: string; price: number; image: string };
+
+export const getFlatProductList = async (): Promise<FlatProduct[]> => {
+  const products = await fetchProducts();
+  const flatList: FlatProduct[] = products.map(p => ({
+    ...p,
+    categoryName: p.category,
+    productName: p.name,
+    productId: p.id,
+    price: p.price ?? 0,
+    image: (p as any).images?.[0] ?? ''
+  }));
+  return flatList;
 };
 
-export const getFlatProductList = async () => {
-  const products = await fetchProducts();
-  const flatList: Array<ProductVariety & { categoryName: string; productName: string; productId: string}> = [];
+// Deal/Combo Types and API
+export interface Deal {
+  _id?: string;
+  title: string;
+  description?: string;
+  image: string;
+  price?: number;
+  mrp?: number;
+  discountPercentage?: number;
+  productIds: string[];
+  link?: string;
+  active?: boolean;
+}
+
+export const fetchDeals = async (): Promise<Deal[]> => {
+  const cacheKey = 'deals_all';
   
-  products.forEach(product => {
-    product.varieties.forEach(variety => {
-      flatList.push({
-        ...variety,
-        categoryName: product.category,
-        productName: product.name,
-        productId: product.id,
-      });
-    });
+  const cachedData = getCachedData<Deal[]>(cacheKey);
+  if (cachedData) return cachedData;
+
+  const response = await fetch(`${API_BASE_URL}/api/deals`);
+  if (!response.ok) throw new Error('Failed to fetch deals');
+  
+  const data = await response.json();
+  setCacheData(cacheKey, data);
+  return data;
+};
+
+export const createDeal = async (deal: Partial<Deal>): Promise<Deal> => {
+  const res = await fetch(`${API_BASE_URL}/api/deals`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(deal),
   });
+  if (!res.ok) throw new Error('Failed to create deal');
+  return res.json();
+};
+
+export const updateDeal = async (id: string, updates: Partial<Deal>): Promise<Deal> => {
+  const res = await fetch(`${API_BASE_URL}/api/deals/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updates),
+  });
+  if (!res.ok) throw new Error('Failed to update deal');
+  return res.json();
+};
+
+export const deleteDeal = async (id: string): Promise<void> => {
+  const res = await fetch(`${API_BASE_URL}/api/deals/${id}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error('Failed to delete deal');
+};
+// Shop By Category Types and API
+export interface ShopCategory {
+  _id?: string;
+  id: string;
+  name: string;
+  link: string;
+  image: string;
+  gradient: string;
+  order: number;
+  active: boolean;
+}
+
+export const fetchShopCategories = async (): Promise<ShopCategory[]> => {
+  const response = await fetch(`${API_BASE_URL}/api/shop-categories`);
+  if (!response.ok) throw new Error('Failed to fetch shop categories');
+  return response.json();
+};
+
+export const fetchAllShopCategories = async (): Promise<ShopCategory[]> => {
+  const cacheKey = 'shop_categories_all';
   
-  return flatList;
+  const cachedData = getCachedData<ShopCategory[]>(cacheKey);
+  if (cachedData) return cachedData;
+
+  const response = await fetch(`${API_BASE_URL}/api/shop-categories/all`);
+  if (!response.ok) throw new Error('Failed to fetch shop categories');
+  
+  const data = await response.json();
+  setCacheData(cacheKey, data);
+  return data;
+};
+
+export const createShopCategory = async (category: Partial<ShopCategory>): Promise<ShopCategory> => {
+  const res = await fetch(`${API_BASE_URL}/api/shop-categories`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(category),
+  });
+  if (!res.ok) throw new Error('Failed to create shop category');
+  return res.json();
+};
+
+export const updateShopCategory = async (id: string, updates: Partial<ShopCategory>): Promise<ShopCategory> => {
+  const res = await fetch(`${API_BASE_URL}/api/shop-categories/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updates),
+  });
+  if (!res.ok) throw new Error('Failed to update shop category');
+  return res.json();
+};
+
+export const deleteShopCategory = async (id: string): Promise<void> => {
+  const res = await fetch(`${API_BASE_URL}/api/shop-categories/${id}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error('Failed to delete shop category');
 };

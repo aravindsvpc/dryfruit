@@ -21,17 +21,26 @@ const Header: React.FC = () => {
   };
 
   const categories = [
-    { name: 'Badam', category: 'almonds' },
-    { name: 'Kaju', category: 'cashews' },
-    { name: 'Akhrot', category: 'walnuts' },
-    { name: 'Kismis', category: 'raisins' },
-    { name: 'Pista', category: 'pistachios' },
-    { name: 'Khajur', category: 'dates' }
+    { name: 'Badam', category: 'Almonds' },
+    { name: 'Kaju', category: 'Kaju' },
+    { name: 'Akhrot', category: 'Walnut' },
+    { name: 'Kismis', category: 'Kismis' },
+    { name: 'Pista', category: 'Pista' },
+    { name: 'Khajur', category: 'Dates' }
   ];
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-white shadow-lg z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Marquee Banner */}
+      <div className="bg-amber-600 text-white overflow-hidden">
+        <div className="animate-marquee whitespace-nowrap py-2 px-4 text-sm font-semibold">
+          <span className="inline-block">🎉 Welcome to Sri Sakhambari Enterprises - Premium Quality Dry Fruits | Free Shipping on Orders Above ₹500 | Fresh Stock Available 🎉</span>
+          <span className="inline-block ml-12">🎉 Welcome to Sri Sakhambari Enterprises - Premium Quality Dry Fruits | Free Shipping on Orders Above ₹500 | Fresh Stock Available 🎉</span>
+        </div>
+      </div>
+
+      {/* Main Header */}
+      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
@@ -43,11 +52,11 @@ const Header: React.FC = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-8">
-            <Link to="/" className="text-gray-700 hover:text-amber-600 transition-colors">
+            <Link to="/" className="text-gray-700 hover:text-amber-600 transition-colors outline-none focus:outline-none focus:ring-0 active:outline-none">
               Home
             </Link>
             <div className="relative group">
-              <Link to="/products" className="text-gray-700 hover:text-amber-600 transition-colors">
+              <Link to="/products" className="text-gray-700 hover:text-amber-600 transition-colors outline-none focus:outline-none focus:ring-0 active:outline-none">
                 Products
               </Link>
               <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
@@ -56,7 +65,7 @@ const Header: React.FC = () => {
                     <Link
                       key={category.name}
                       to={`/products/${category.category}`}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600 outline-none focus:outline-none focus:ring-0 active:outline-none"
                     >
                       {category.name}
                     </Link>
@@ -64,8 +73,11 @@ const Header: React.FC = () => {
                 </div>
               </div>
             </div>
-            <Link to="/contact" className="text-gray-700 hover:text-amber-600 transition-colors">
+            <Link to="/contact" className="text-gray-700 hover:text-amber-600 transition-colors outline-none focus:outline-none focus:ring-0 active:outline-none">
               Contact
+            </Link>
+            <Link to="/deals" className="text-gray-700 hover:text-amber-600 transition-colors outline-none">
+              Deals
             </Link>
           </nav>
 
@@ -89,18 +101,12 @@ const Header: React.FC = () => {
               <div className="relative group">
                 <button className="flex items-center space-x-2 text-gray-700 hover:text-amber-600">
                   <User className="h-6 w-6" />
-                  <span className="hidden sm:inline">{user.name}</span>
+                  <Link to="/admin" className="hidden sm:block px-4 py-2 text-sm font-semibold text-amber-600 border-2 border-amber-600 rounded-full hover:bg-amber-600 hover:text-white transition-all duration-200">
+                    Admin Panel
+                  </Link>
                 </button>
                 <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                   <div className="py-2">
-                    {user.isAdmin && (
-                      <Link
-                        to="/admin"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600"
-                      >
-                        Admin Panel
-                      </Link>
-                    )}
                     <button
                       onClick={logout}
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600"
@@ -110,11 +116,10 @@ const Header: React.FC = () => {
                   </div>
                 </div>
               </div>
-            ) : (
-              <Link to="/login" className="text-gray-700 hover:text-amber-600 transition-colors">
-                <User className="h-6 w-6" />
-              </Link>
-            )}
+            ) : null}
+            
+            {/* Admin Login Link */}
+            
             
             <Link to="/cart" className="relative text-gray-700 hover:text-amber-600 transition-colors">
               <ShoppingCart className="h-6 w-6" />
@@ -169,6 +174,13 @@ const Header: React.FC = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contact
+              </Link>
+              <Link
+                to="/deals"
+                className="block px-3 py-2 text-gray-700 hover:text-amber-600 hover:bg-amber-50 rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Deals
               </Link>
             </div>
           </div>

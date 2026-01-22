@@ -1,0 +1,25 @@
+<svg viewBox="0 0 467 672" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <!-- Background -->
+  <rect width="467" height="672" fill="#F5E6D3"/>
+  
+  <!-- Text -->
+  <text x="233" y="248" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#C9956F" text-anchor="middle">DRIED FRUITS</text>
+  
+  <!-- Decorative dried fruits sketches at bottom -->
+  <g fill="none" stroke="#C9956F" stroke-width="2" opacity="0.6">
+    <!-- Various dried fruit illustrations (simplified) -->
+    <ellipse cx="40" cy="480" rx="25" ry="30" transform="rotate(-20 40 480)"/>
+    <ellipse cx="120" cy="500" rx="20" ry="28" transform="rotate(15 120 500)"/>
+    <ellipse cx="200" cy="470" rx="30" ry="35" transform="rotate(-30 200 470)"/>
+    <ellipse cx="280" cy="510" rx="22" ry="30" transform="rotate(25 280 510)"/>
+    <ellipse cx="360" cy="480" rx="25" ry="32" transform="rotate(-15 360 480)"/>
+    <ellipse cx="430" cy="495" rx="20" ry="28" transform="rotate(20 430 495)"/>
+    
+    <!-- Small fruits -->
+    <circle cx="85" cy="550" r="12"/>
+    <circle cx="140" cy="570" r="10"/>
+    <circle cx="240" cy="560" r="11"/>
+    <circle cx="320" cy="580" r="9"/>
+    <circle cx="390" cy="555" r="12"/>
+  </g>
+</svg>

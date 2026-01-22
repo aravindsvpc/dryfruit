@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { CreditCard, Lock, Check } from 'lucide-react';
+import { CreditCard, Lock, Check, ArrowLeft } from 'lucide-react';
 
 const Checkout: React.FC = () => {
+  const navigate = useNavigate();
   const { state, dispatch } = useCart();
   const { user } = useAuth();
   const [step, setStep] = useState(1);
@@ -96,7 +98,14 @@ const Checkout: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-amber-50 py-8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-amber-600 hover:text-amber-700 mb-6 font-semibold transition-colors"
+        >
+          <ArrowLeft className="h-5 w-5" />
+          <span>Back</span>
+        </button>
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
 
         {/* Progress Steps */}

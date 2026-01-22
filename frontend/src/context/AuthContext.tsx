@@ -17,6 +17,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, name: string) => Promise<void>;
+  adminLogin: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -60,6 +61,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, 1000);
   };
 
+  const adminLogin = async (email: string, password: string) => {
+    setAuthState(prev => ({ ...prev, isLoading: true }));
+    
+    // Verify admin credentials
+    return new Promise<void>((resolve, reject) => {
+      setTimeout(() => {
+        if (email === 'admin@dryfruit.com' && password === 'admin123') {
+          const adminUser: User = {
+            id: 'admin-1',
+            email,
+            name: 'Admin',
+            isAdmin: true
+          };
+          setAuthState({ user: adminUser, isLoading: false });
+          resolve();
+        } else {
+          setAuthState(prev => ({ ...prev, isLoading: false }));
+          reject(new Error('Invalid admin credentials'));
+        }
+      }, 1000);
+    });
+  };
+
   const logout = () => {
     setAuthState({ user: null, isLoading: false });
   };
@@ -70,6 +94,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isLoading: authState.isLoading,
       login,
       signup,
+      adminLogin,
       logout
     }}>
       {children}

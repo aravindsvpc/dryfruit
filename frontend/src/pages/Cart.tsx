@@ -1,9 +1,10 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 const Cart: React.FC = () => {
+  const navigate = useNavigate();
   const { state, dispatch } = useCart();
 
   const updateQuantity = (id: string, quantity: number) => {
@@ -22,6 +23,13 @@ const Cart: React.FC = () => {
     return (
       <div className="min-h-screen bg-amber-50 py-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-amber-600 hover:text-amber-700 mb-6 font-semibold transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5" />
+            <span>Back</span>
+          </button>
           <div className="text-center py-16">
             <ShoppingBag className="h-24 w-24 text-gray-400 mx-auto mb-4" />
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Your Cart is Empty</h2>
@@ -43,6 +51,13 @@ const Cart: React.FC = () => {
   return (
     <div className="min-h-screen bg-amber-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-amber-600 hover:text-amber-700 mb-6 font-semibold transition-colors"
+        >
+          <ArrowLeft className="h-5 w-5" />
+          <span>Back</span>
+        </button>
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Shopping Cart</h1>
           <button

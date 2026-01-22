@@ -1,36 +1,23 @@
 import { Product } from '../models/Product';
 import { connectDB } from '../db2';
+import { Deal } from '../models/Deal';
 
 const sampleProduct = {
     id: 'kismis',
     name: 'Kismis (Raisins)',
-    basePrice:100,
-    rating:4.7,
+    price: 120,
+    type: 'weight',
     category: 'raisins',
-    image: 'https://5.imimg.com/data5/SELLER/Default/2021/11/SA/KH/IG/26477838/indian-natural-green-kismis-raisins-1000x1000.jpg',
+    images: ['https://5.imimg.com/data5/SELLER/Default/2021/11/SA/KH/IG/26477838/indian-natural-green-kismis-raisins-1000x1000.jpg'],
     description: 'Premium quality raisins available in multiple varieties',
-    varieties: [
-      {
-        id: 'kismis-golden',
-        name: 'Golden Kismis',
-        type: 'weight',
-        price: 100,
-        description: 'Sweet and chewy golden raisins, perfect for snacking and cooking',
-        image: 'https://5.imimg.com/data5/SELLER/Default/2021/11/SA/KH/IG/26477838/indian-natural-green-kismis-raisins-1000x1000.jpg',
-        inStock: true,
-        stockQuantity: 50
-      },
-      {
-        id: 'kismis-black',
-        name: 'Black Kismis',
-        type: 'weight',
-        price: 120,
-        description: 'Rich and flavorful black raisins with natural sweetness',
-        image: 'https://mcprod.hyperone.com.eg/media/catalog/product/cache/1ca275941aea0ae98b372dcb44b7c67a/2/3/2394510000000.jpeg',
-        inStock: true,
-        stockQuantity: 45
-      },
-  ]
+    inStock: true,
+    stockQuantity: 150
+};
+const sampleDeal = {
+  image: 'https://www.instagram.com/reel/DPHU8MHElFs/?utm_source=ig_web_copy_link&igsh=MWY5NXQ4emk5eWFlOQ==',
+  link: 'https://example.com/deal',
+  title: 'Special Deal on Kismis',
+  price: 90,
 };
 
 const insertSampleProduct = async () => {
@@ -38,6 +25,10 @@ const insertSampleProduct = async () => {
   const product = new Product(sampleProduct);
   await product.save();
   console.log('Sample product inserted!');
+
+  // const deal = new Deal(sampleDeal);
+  // await deal.save();
+  // console.log('Sample deal inserted!');
   process.exit(0);
 };
 

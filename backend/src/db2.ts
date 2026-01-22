@@ -8,7 +8,7 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-const MONGO_URI = process.env.MONGO_URI || '';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://aravindsvpc:4diKx2TrbJhqDtPE@srisakhambari.1gmpdho.mongodb.net/ssdb';
 
 export const connectDB = async () => {
   try {

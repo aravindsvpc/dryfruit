@@ -3,7 +3,8 @@ import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 import { Product } from './models/Product';
-
+import { Deal } from './models/Deal';
+import { ShopByCategory } from './models/ShopByCategory';
 
 dotenv.config();
 const app = express();
@@ -14,7 +15,7 @@ app.use(cors({
 }));
 app.use(express.json());
 
-const MONGO_URI = process.env.MONGO_URI || '';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://aravindsvpc:4diKx2TrbJhqDtPE@srisakhambari.1gmpdho.mongodb.net/ssdb';
 
 export const connectDB = async () => {
   try {
@@ -49,38 +50,178 @@ if (require.main === module) {
 
   app.get('/api/products/:id', async (req, res) => {
     try {
-      const product = await Product.findById(req.params.id);
+      const idParam = req.params.id;
+      // Accept either MongoDB _id or string product `id` field
+      const query = mongoose.Types.ObjectId.isValid(idParam)
+        ? { $or: [{ _id: idParam }, { id: idParam }] }
+        : { id: idParam };
+      const product = await Product.findOne(query as any);
       if (!product) return res.status(404).json({ message: 'Product not found' });
       return res.json(product);
     } catch (err) {
+      console.error('Product fetch error:', err);
       return res.status(500).json({ message: 'Server error' });
     }
   });
 
-  // Get a single variety by productId and varietyId
-  app.get('/api/products/:productId/varieties/:varietyId', async (req, res) => {
+  // --- Deals API Endpoints ---
+  app.get('/api/deals', async (req, res) => {
     try {
-      const product = await Product.findOne({ $or: [{ id: req.params.productId }, { id: req.params.productId }] });
-      if (!product) {
-        console.error('Product not found for productId:', req.params.productId);
-        return res.status(404).json({ message: 'Product not found' });
-      }
-      if (!Array.isArray(product.varieties)) {
-        console.error('Product varieties not found or not an array:', product);
-        return res.status(500).json({ message: 'Product varieties not found' });
-      }
-      // Log all variety ids for debugging
-      console.log('Available variety ids:', product.varieties.map(v => v.id));
-      const variety = product.varieties.find((v) => String(v.id) === String(req.params.varietyId));
-      if (!variety) {
-        console.error('Variety not found for varietyId:', req.params.varietyId, 'in product:', product._id || product.id);
-        return res.status(404).json({ message: 'Variety not found' });
-      }
-      // Add productId to the returned variety for frontend routing
-      return res.json({ ...variety.toObject(), productId: product.id?.toString?.() || product.id, productName: product.name, categoryName: product.category });
+      const deals = await Deal.find();
+      res.json(deals);
     } catch (err) {
-      console.error('Variety fetch error:', err);
-      return res.status(500).json({ message: 'Server error', error: (err as any)?.message || err });
+      res.status(500).json({ message: 'Error fetching deals', error: err });
+    }
+  });
+
+  app.post('/api/deals', async (req, res) => {
+    try {
+      const { title, description, image, price, discountPercentage, productIds, link, active } = req.body;
+      if (!title || !image || !Array.isArray(productIds) || productIds.length === 0) {
+        return res.status(400).json({ message: 'Missing required deal fields (title, image, productIds)' });
+      }
+      const deal = new Deal({ title, description, image, price, discountPercentage, productIds, link, active: active ?? true });
+      await deal.save();
+      return res.status(201).json(deal);
+    } catch (err) {
+      console.error('Create deal error:', err);
+      return res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.put('/api/deals/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+      const updated = await Deal.findByIdAndUpdate(id, { $set: updates }, { new: true });
+      if (!updated) return res.status(404).json({ message: 'Deal not found' });
+      return res.json(updated);
+    } catch (err) {
+      console.error('Update deal error:', err);
+      return res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.delete('/api/deals/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deleted = await Deal.findByIdAndDelete(id);
+      if (!deleted) return res.status(404).json({ message: 'Deal not found' });
+      return res.json({ message: 'Deal deleted' });
+    } catch (err) {
+      console.error('Delete deal error:', err);
+      return res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  // Create a new product
+  app.post('/api/products', async (req, res) => {
+    try {
+      const { id, name, category, price, type, images, description, inStock, stockQuantity } = req.body;
+      // require price and at least one image
+      if (!name || !category || price === undefined || !Array.isArray(images) || images.length === 0 || !description) {
+        return res.status(400).json({ message: 'Missing required product fields (name, category, price, images, description)' });
+      }
+      const productId = id || String(name).toLowerCase().replace(/\s+/g, '-');
+      // prevent duplicate id
+      const existing = await Product.findOne({ id: productId });
+      if (existing) return res.status(409).json({ message: 'Product with this id already exists' });
+      const product = new Product({ id: productId, name, category, price, type, images, description, inStock: inStock ?? true, stockQuantity: stockQuantity ?? 0 });
+      await product.save();
+      return res.status(201).json(product);
+    } catch (err) {
+      console.error('Create product error:', err);
+      return res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  // Update product by id or _id
+  app.put('/api/products/:id', async (req, res) => {
+    try {
+      const idParam = req.params.id;
+      const query = mongoose.Types.ObjectId.isValid(idParam) ? { $or: [{ _id: idParam }, { id: idParam }] } : { id: idParam };
+      const updates = req.body;
+      const updated = await Product.findOneAndUpdate(query as any, { $set: updates }, { new: true });
+      if (!updated) return res.status(404).json({ message: 'Product not found' });
+      return res.json(updated);
+    } catch (err) {
+      console.error('Update product error:', err);
+      return res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  // Delete product
+  app.delete('/api/products/:id', async (req, res) => {
+    try {
+      const idParam = req.params.id;
+      const query = mongoose.Types.ObjectId.isValid(idParam) ? { $or: [{ _id: idParam }, { id: idParam }] } : { id: idParam };
+      const deleted = await Product.findOneAndDelete(query as any);
+      if (!deleted) return res.status(404).json({ message: 'Product not found' });
+      return res.json({ message: 'Product deleted' });
+    } catch (err) {
+      console.error('Delete product error:', err);
+      return res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  // --- Shop By Category API Endpoints ---
+  app.get('/api/shop-categories', async (req, res) => {
+    try {
+      const categories = await ShopByCategory.find({ active: true }).sort({ order: 1 });
+      res.json(categories);
+    } catch (err) {
+      res.status(500).json({ message: 'Error fetching shop categories', error: err });
+    }
+  });
+
+  app.get('/api/shop-categories/all', async (req, res) => {
+    try {
+      const categories = await ShopByCategory.find().sort({ order: 1 });
+      res.json(categories);
+    } catch (err) {
+      res.status(500).json({ message: 'Error fetching shop categories', error: err });
+    }
+  });
+
+  app.post('/api/shop-categories', async (req, res) => {
+    try {
+      const { id, name, link, image, gradient, order, active } = req.body;
+      if (!id || !name || !link || !image) {
+        return res.status(400).json({ message: 'Missing required fields (id, name, link, image)' });
+      }
+      const existing = await ShopByCategory.findOne({ id });
+      if (existing) return res.status(409).json({ message: 'Category with this id already exists' });
+      const category = new ShopByCategory({ id, name, link, image, gradient: gradient || 'from-amber-400 to-amber-600', order: order || 0, active: active ?? true });
+      await category.save();
+      return res.status(201).json(category);
+    } catch (err) {
+      console.error('Create shop category error:', err);
+      return res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.put('/api/shop-categories/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+      const updated = await ShopByCategory.findByIdAndUpdate(id, { $set: updates }, { new: true });
+      if (!updated) return res.status(404).json({ message: 'Category not found' });
+      return res.json(updated);
+    } catch (err) {
+      console.error('Update shop category error:', err);
+      return res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.delete('/api/shop-categories/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deleted = await ShopByCategory.findByIdAndDelete(id);
+      if (!deleted) return res.status(404).json({ message: 'Category not found' });
+      return res.json({ message: 'Category deleted' });
+    } catch (err) {
+      console.error('Delete shop category error:', err);
+      return res.status(500).json({ message: 'Server error' });
     }
   });
 

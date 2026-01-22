@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { Filter, Grid, List } from 'lucide-react';
+import { Filter, Grid, List, ArrowLeft } from 'lucide-react';
 import { getFlatProductList } from '../data/products';
 import ProductVarietyCard from '../components/ProductVarietyCard';
 
@@ -12,13 +12,17 @@ const Products: React.FC = () => {
   const [sortBy, setSortBy] = useState('name');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [showFilters, setShowFilters] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const searchQuery = searchParams.get('search') || '';
 
   const [allProducts, setAllProducts] = useState<any[]>([]);
 
   useEffect(() => {
-    getFlatProductList().then(setAllProducts);
+    setIsLoading(true);
+    getFlatProductList()
+      .then(setAllProducts)
+      .finally(() => setIsLoading(false));
   }, []);
 
   const filteredProducts = allProducts.filter(product => {
@@ -42,13 +46,31 @@ const Products: React.FC = () => {
     }
   });
 
-  const categories = ['almonds', 'cashews', 'walnuts', 'raisins', 'pistachios', 'dates'];
+  const categories = ['Almonds', 'Kaju', 'Walnuts', 'Kismis', 'Pista', 'Dates'];
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-amber-50 py-8 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mb-4"></div>
+          <p className="text-gray-600 font-semibold">Loading products...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-amber-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-amber-600 hover:text-amber-700 mb-4 font-semibold transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5" />
+            <span>Back</span>
+          </button>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             {category ? `${category.charAt(0).toUpperCase() + category.slice(1)}` : 'All Products'}
             {searchQuery && ` - "${searchQuery}"`}

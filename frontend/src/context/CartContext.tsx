@@ -8,6 +8,8 @@ export interface CartItem {
   quantity: number;
   type: string;
   grams?: number; // only for type 'weight', in multiples of 250
+  isDeal?: boolean; // flag for deal items
+  dealProducts?: string[]; // product IDs in the deal
 }
 
 interface CartState {
