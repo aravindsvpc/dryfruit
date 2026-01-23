@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
 import { Product } from './models/Product';
 import { Deal } from './models/Deal';
 import { ShopByCategory } from './models/ShopByCategory';
@@ -227,4 +228,12 @@ if (require.main === module) {
 
 }
 // app.use('/api', contactRouter);
+
+// Serve static files from frontend dist folder
+app.use(express.static(path.join(__dirname, '../../frontend/dist')));
+
+// SPA fallback - serve index.html for all unknown routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../frontend/dist/index.html'));
+});
 
