@@ -16,5 +16,5 @@ export default defineConfig({
     outDir: 'dist', // Ensure build output is in dist
     sourcemap: false,
   },
-  base: './', // Use relative base path for static hosting
+  base: '/', // Use absolute base path for proper routing
 });

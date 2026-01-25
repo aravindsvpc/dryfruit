@@ -14,6 +14,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Contact from './pages/Contact';
 import AdminPanel from './pages/AdminPanel';
+import AdminLogin from './pages/AdminLogin';
 import Deals from './pages/Deals';
 import Loading from './components/Loading';
 
@@ -59,17 +60,18 @@ function App() {
             <main className="pt-32">
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/products" element={<Products />} />
-                <Route path="/products/:category" element={<Products />} />
-                <Route path="/products/:productId" element={<ProductDetail />} />
                 <Route path="/products/:productId/varieties/:varietyId" element={<ProductDetail />} />
+                <Route path="/products/:productId" element={<ProductDetail />} />
+                <Route path="/products/:category" element={<Products />} />
+                <Route path="/products" element={<Products />} />
                 <Route path="/product/:id/detail" element={<ProductDetail />} />
                 <Route path="/combo/:comboId" element={<ComboDetail />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/deals" element={<Deals />} />
-                <Route path="/admin" element={<AdminPanel />} />
+                <Route path="/admin" element={<AdminLogin />} />
+                <Route path="/admin/dashboard" element={<AdminPanel />} />
               </Routes>
             </main>
             <Footer />
